@@ -20,17 +20,30 @@ import java.util.*;
 public class FillHoleCommand implements CommandExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
+        /*
+         *
+         */
+
+        // check if the sender is a player
         if (!(sender instanceof Player player)) {
             sender.sendMessage("This command must be executed by a player!");
             return true;
         }
 
+        // check if the player has permission to use this command
+        if (!player.hasPermission("fillhole.use")) {
+            player.sendMessage("You do not have permission to use this command.");
+            return true;
+        }
+
+        // check that the command is used correctly
         if (args.length < 1) {
             player.sendMessage("Usage: /fillhole <pattern>");
             return true;
         }
 
         try {
+            // get pattern argument
             String patternInput = args[0];
 
             ParserContext context = new ParserContext();
@@ -41,36 +54,38 @@ public class FillHoleCommand implements CommandExecutor {
                     .getPatternFactory()
                     .parseFromInput(patternInput, context);
 
-            Region selection = WorldEdit.getInstance()
-                    .getSessionManager()
-                    .get(BukkitAdapter.adapt(player))
-                    .getSelection();
 
-            if (selection == null) {
+            Region selection;
+            try {
+                selection = WorldEdit.getInstance()
+                        .getSessionManager()
+                        .get(BukkitAdapter.adapt(player))
+                        .getSelection();
+            } catch (Exception e) {
                 player.sendMessage("Please select a region first!");
                 return true;
             }
 
+            // get the FAWE edit seesion
             LocalSession session = WorldEdit.getInstance()
                     .getSessionManager()
                     .get(BukkitAdapter.adapt(player));
             EditSession editSession = session.createEditSession(BukkitAdapter.adapt(player));
 
             try {
+                // detect and fill hole
                 Set<BlockVector3> blockChange = getHoleBlocks(selection, editSession);
-
                 editSession.setBlocks(blockChange, pattern);
 
                 player.sendMessage(blockChange.isEmpty() ?
                         "No holes were found within the specified size." :
                         "All the holes have been filled!");
             } finally {
+                // saves the operation in the history and can be used undo
                 editSession.flushQueue();
                 session.remember(editSession);
             }
 
-        } catch (NumberFormatException e) {
-            player.sendMessage("Invalid size!");
         } catch (Exception e) {
             player.sendMessage("Error : " + e.getMessage());
         }
@@ -79,6 +94,9 @@ public class FillHoleCommand implements CommandExecutor {
     }
 
     private List<BlockVector3> getAdjacentBlocks(BlockVector3 block) {
+        /*
+         *
+         */
         return List.of(
                 block.add(1, 0, 0),  // Est
                 block.add(-1, 0, 0), // Ouest
@@ -90,14 +108,19 @@ public class FillHoleCommand implements CommandExecutor {
     }
 
     private boolean isValidMaterial(EditSession editSession, BlockVector3 block) {
+        /*
+         *
+         */
         BlockMaterial material = editSession.getBlock(block).getBlockType().getMaterial();
-        return material.isAir() || material.isLiquid() || material.isTranslucent()
-                || material.isOpaque() || !material.isFullCube();
+        return material.isAir() || material.isLiquid() || material.isTranslucent() || !material.isFullCube();
     }
 
 
     private Set<BlockVector3> getHoleBlocks(Region selection, EditSession editSession) {
-        // Dimensions de la région
+        /*
+         *
+         */
+
         BlockVector3 min = selection.getMinimumPoint();
         BlockVector3 max = selection.getMaximumPoint();
 
@@ -110,7 +133,7 @@ public class FillHoleCommand implements CommandExecutor {
         Deque<BlockVector3> nextVisit = new ArrayDeque<>();
         Set<BlockVector3> change = new HashSet<>();
 
-        // Initialisation
+        // initialise visited to false
         for (BlockVector3 block : selection) {
             if (isValidMaterial(editSession, block)) {
                 int x = block.x() - min.x();
@@ -132,6 +155,7 @@ public class FillHoleCommand implements CommandExecutor {
                 Set<BlockVector3> currentChain = new HashSet<>();
                 boolean touchesBorder = false;
 
+                //check adjacent block to detect hole
                 while (!nextVisit.isEmpty()) {
                     BlockVector3 current = nextVisit.pollFirst();
                     currentChain.add(current);
@@ -141,6 +165,7 @@ public class FillHoleCommand implements CommandExecutor {
                         int adjY = adjacent.y() - min.y();
                         int adjZ = adjacent.z() - min.z();
 
+                        // if a block in the hole touches the edge of the selection, the hole is not a hole
                         if (adjX < 0 || adjX >= dx || adjY < 0 || adjY >= dy || adjZ < 0 || adjZ >= dz) {
                             touchesBorder = true;
                         } else if (!visited[adjX][adjY][adjZ] && isValidMaterial(editSession, adjacent)) {

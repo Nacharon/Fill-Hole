@@ -1,5 +1,5 @@
 name: FillHole
-version: '1.0.11'
+version: '1.0.12'
 main: me.nacharon.fillhole.FillHole
 api-version: '1.20.6'
 commands:
@@ -7,3 +7,12 @@ commands:
     description: Fill the holes in the selection
     usage: /fillhole <pattern>
     aliases: [ fh ]
+    permissions:
+      fillhole.use:
+        description: Allows to use the /fillhole command
+        default: op
+
+permissions:
+  fillhole.use:
+    description: Allows to use the /fillhole command
+    default: op
