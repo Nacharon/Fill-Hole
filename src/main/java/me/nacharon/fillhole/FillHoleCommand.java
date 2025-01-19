@@ -18,12 +18,12 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 
 public class FillHoleCommand implements CommandExecutor {
+
+    /*
+     *
+     */
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
-        /*
-         *
-         */
-
         // check if the sender is a player
         if (!(sender instanceof Player player)) {
             sender.sendMessage("This command must be executed by a player!");
@@ -93,10 +93,10 @@ public class FillHoleCommand implements CommandExecutor {
         return true;
     }
 
+    /*
+     *
+     */
     private List<BlockVector3> getAdjacentBlocks(BlockVector3 block) {
-        /*
-         *
-         */
         return List.of(
                 block.add(1, 0, 0),  // Est
                 block.add(-1, 0, 0), // Ouest
@@ -107,20 +107,18 @@ public class FillHoleCommand implements CommandExecutor {
         );
     }
 
+    /*
+     *
+     */
     private boolean isValidMaterial(EditSession editSession, BlockVector3 block) {
-        /*
-         *
-         */
         BlockMaterial material = editSession.getBlock(block).getBlockType().getMaterial();
         return material.isAir() || material.isLiquid() || material.isTranslucent() || !material.isFullCube();
     }
 
-
+    /*
+     *
+     */
     private Set<BlockVector3> getHoleBlocks(Region selection, EditSession editSession) {
-        /*
-         *
-         */
-
         BlockVector3 min = selection.getMinimumPoint();
         BlockVector3 max = selection.getMaximumPoint();
 
