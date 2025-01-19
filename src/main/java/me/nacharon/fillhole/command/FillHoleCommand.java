@@ -1,4 +1,5 @@
-package me.nacharon.fillhole;
+package me.nacharon.fillhole.command;
+
 
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
@@ -9,6 +10,7 @@ import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
+import me.nacharon.fillhole.utils.PluginUtils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -17,59 +19,55 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
+
+/**
+ * Define FillHole Command
+ */
 public class FillHoleCommand implements CommandExecutor {
 
-    /*
+    /**
+     * Handles the execution of the /fillhole command.
      *
+     * @param sender  the sender of the command
+     * @param command the command being executed
+     * @param label   the alias used to trigger the command
+     * @param args    the arguments passed with the command
+     * @return true if the command was executed successfully, false otherwise
      */
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
         // check if the sender is a player
         if (!(sender instanceof Player player)) {
-            sender.sendMessage("This command must be executed by a player!");
+            sender.sendMessage(PluginUtils.textRed("This command must be executed by a player!"));
             return true;
         }
 
         // check if the player has permission to use this command
         if (!player.hasPermission("fillhole.use")) {
-            player.sendMessage("You do not have permission to use this command.");
+            player.sendMessage(PluginUtils.textRed("You do not have permission to use this command."));
             return true;
         }
 
         // check that the command is used correctly
         if (args.length < 1) {
-            player.sendMessage("Usage: /fillhole <pattern>");
+            player.sendMessage(PluginUtils.textRed("Usage: /fillhole <pattern>"));
             return true;
         }
 
         try {
-            // get pattern argument
             String patternInput = args[0];
-
-            ParserContext context = new ParserContext();
-            context.setActor(BukkitAdapter.adapt(player));
-            context.setExtent(BukkitAdapter.adapt(player.getWorld()));
-
-            Pattern pattern = WorldEdit.getInstance()
-                    .getPatternFactory()
-                    .parseFromInput(patternInput, context);
-
+            Pattern pattern = getPattern(patternInput, player);
 
             Region selection;
             try {
-                selection = WorldEdit.getInstance()
-                        .getSessionManager()
-                        .get(BukkitAdapter.adapt(player))
-                        .getSelection();
+                selection = getSelection(player);
             } catch (Exception e) {
-                player.sendMessage("Please select a region first!");
+                player.sendMessage(PluginUtils.textRed("Please select a cuboid selection first!"));
                 return true;
             }
 
-            // get the FAWE edit seesion
-            LocalSession session = WorldEdit.getInstance()
-                    .getSessionManager()
-                    .get(BukkitAdapter.adapt(player));
+            // get FAWE edit seesion
+            LocalSession session = getLocalSession(player);
             EditSession editSession = session.createEditSession(BukkitAdapter.adapt(player));
 
             try {
@@ -77,9 +75,10 @@ public class FillHoleCommand implements CommandExecutor {
                 Set<BlockVector3> blockChange = getHoleBlocks(selection, editSession);
                 editSession.setBlocks(blockChange, pattern);
 
-                player.sendMessage(blockChange.isEmpty() ?
-                        "No holes were found within the specified size." :
-                        "All the holes have been filled!");
+                if (blockChange.isEmpty())
+                    player.sendMessage(PluginUtils.textGray("No holes were found within the specified size."));
+                else
+                    player.sendMessage(PluginUtils.textGray(blockChange.size() + " blocks have been filled"));
             } finally {
                 // saves the operation in the history and can be used undo
                 editSession.flushQueue();
@@ -87,14 +86,62 @@ public class FillHoleCommand implements CommandExecutor {
             }
 
         } catch (Exception e) {
-            player.sendMessage("Error : " + e.getMessage());
+            player.sendMessage(PluginUtils.textRed("Error : " + e.getMessage()));
         }
 
         return true;
     }
 
-    /*
+    /**
+     * Retrieves the LocalSession of the specified player.
      *
+     * @param player The player for whom the LocalSession is retrieved.
+     * @return The LocalSession associated with the player.
+     */
+    private LocalSession getLocalSession(Player player) {
+        return WorldEdit.getInstance()
+                .getSessionManager()
+                .get(BukkitAdapter.adapt(player));
+    }
+
+    /**
+     * Retrieves the current WorldEdit region selection of the specified player.
+     *
+     * @param player The player whose selection is being retrieved.
+     * @return The selected region of the player.
+     * @throws IllegalStateException if the player has no valid selection.
+     */
+    private Region getSelection(Player player) {
+
+        return WorldEdit.getInstance()
+                .getSessionManager()
+                .get(BukkitAdapter.adapt(player))
+                .getSelection();
+    }
+
+    /**
+     * Parses and retrieves a WorldEdit pattern from the provided input.
+     *
+     * @param patternInput The string input representing the pattern.
+     * @param player       The player providing the input, used for parsing context.
+     * @return A parsed Pattern object.
+     * @throws com.sk89q.worldedit.extension.input.InputParseException if the input cannot be parsed into a valid pattern.
+     */
+    private Pattern getPattern(String patternInput, Player player) {
+        ParserContext context = new ParserContext();
+        context.setActor(BukkitAdapter.adapt(player));
+        context.setExtent(BukkitAdapter.adapt(player.getWorld()));
+
+        return WorldEdit.getInstance()
+                .getPatternFactory()
+                .parseFromInput(patternInput, context);
+    }
+
+    /**
+     * Gets the adjacent blocks of a given block.
+     *
+     * @param block the block to get adjacent blocks for
+     * @return a list of adjacent blocks
      */
     private List<BlockVector3> getAdjacentBlocks(BlockVector3 block) {
         return List.of(
@@ -107,16 +154,24 @@ public class FillHoleCommand implements CommandExecutor {
         );
     }
 
-    /*
+    /**
+     * Checks if the material of a block is valid for processing.
      *
+     * @param editSession the current edit session
+     * @param block       the block to check
+     * @return true if the block material is valid, false otherwise
      */
     private boolean isValidMaterial(EditSession editSession, BlockVector3 block) {
         BlockMaterial material = editSession.getBlock(block).getBlockType().getMaterial();
         return material.isAir() || material.isLiquid() || material.isTranslucent() || !material.isFullCube();
     }
 
-    /*
+    /**
+     * Detects holes within a region and returns the blocks to be filled.
      *
+     * @param selection   the region to scan for holes
+     * @param editSession the current edit session
+     * @return a set of blocks representing the holes
      */
     private Set<BlockVector3> getHoleBlocks(Region selection, EditSession editSession) {
         BlockVector3 min = selection.getMinimumPoint();
