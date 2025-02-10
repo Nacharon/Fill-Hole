@@ -1,10 +1,8 @@
 package me.nacharon.fillhole.command;
 
 
-import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.extension.factory.PatternFactory;
 import com.sk89q.worldedit.extension.input.InputParseException;
-import com.sk89q.worldedit.extension.input.ParserContext;
+import me.nacharon.fillhole.api.fawe.FaweHook;
 import me.nacharon.fillhole.utils.PluginUtils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -39,38 +37,17 @@ public class FillHoleTabCompleter implements TabCompleter {
             if (player.hasPermission("fillhole.use")) {
 
                 if (args.length == 1) {
+                    try {
+                        completions = FaweHook.getPatternSuggestions(args[0], player);
+                    } catch (InputParseException e) {
+                        player.sendMessage(PluginUtils.textRed("Error : " + e.getMessage()));
+                    }
                     // add pattern suggestions
-                    return getPatternSuggestions(args[0], player);
+                    return completions;
                 }
             }
         }
 
         return completions;
-    }
-
-    /**
-     * Fetches pattern suggestions based on user input.
-     *
-     * @param input  The partial pattern input from the user.
-     * @param player The player requesting suggestions.
-     * @return A list of pattern suggestions matching the input.
-     */
-    private List<String> getPatternSuggestions(String input, Player player) {
-        List<String> suggestions = new ArrayList<>();
-
-        try {
-            PatternFactory patternFactory = WorldEdit.getInstance().getPatternFactory();
-
-            ParserContext context = new ParserContext();
-            context.setActor(null);
-            context.setWorld(null);
-
-            // get pattern suggestions
-            suggestions = patternFactory.getSuggestions(input, context);
-        } catch (InputParseException e) {
-            player.sendMessage(PluginUtils.textRed("Error : " + e.getMessage()));
-        }
-
-        return suggestions;
     }
 }
