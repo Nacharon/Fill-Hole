@@ -11,6 +11,11 @@ This command fills the detected holes in the selected region with the specified 
 
 You can also use the alias `fh`.
 
+### New Mask
+Add 2 new mask, useful for cleaning terrain, in start of Terraforming or for fix some hole
+- `#translucent`
+- `#full_cube`
+
 ---
 
 ## Installation
