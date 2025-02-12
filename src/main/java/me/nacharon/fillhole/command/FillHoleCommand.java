@@ -1,15 +1,13 @@
 package me.nacharon.fillhole.command;
 
-
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
-import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
+import me.nacharon.fillhole.api.fawe.FaweHook;
 import me.nacharon.fillhole.utils.PluginUtils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -56,85 +54,37 @@ public class FillHoleCommand implements CommandExecutor {
 
         try {
             String patternInput = args[0];
-            Pattern pattern = getPattern(patternInput, player);
+
+            Pattern pattern = FaweHook.getPattern(patternInput, player);
+
+            // get FAWE local session
+            LocalSession localSession = FaweHook.getLocalSession(player);
 
             Region selection;
             try {
-                selection = getSelection(player);
+                selection = FaweHook.getSelection(localSession);
             } catch (Exception e) {
                 player.sendMessage(PluginUtils.textRed("Please select a cuboid selection first!"));
                 return true;
             }
 
-            // get FAWE edit seesion
-            LocalSession session = getLocalSession(player);
-            EditSession editSession = session.createEditSession(BukkitAdapter.adapt(player));
+            // get FAWE edit session
+            EditSession editSession = localSession.createEditSession(BukkitAdapter.adapt(player));
 
-            try {
-                // detect and fill hole
-                Set<BlockVector3> blockChange = getHoleBlocks(selection, editSession);
-                editSession.setBlocks(blockChange, pattern);
+            // detect and fill hole
+            Set<BlockVector3> blockChange = getHoleBlocks(selection, editSession);
+            FaweHook.setBlocks(blockChange, pattern, localSession, editSession);
 
-                if (blockChange.isEmpty())
-                    player.sendMessage(PluginUtils.textGray("No holes were found within the specified size."));
-                else
-                    player.sendMessage(PluginUtils.textGray(blockChange.size() + " blocks have been filled"));
-            } finally {
-                // saves the operation in the history and can be used undo
-                editSession.flushQueue();
-                session.remember(editSession);
-            }
+            if (blockChange.isEmpty())
+                player.sendMessage(PluginUtils.textGray("No holes were found in this selection."));
+            else
+                player.sendMessage(PluginUtils.textGray(blockChange.size() + " blocks have been filled"));
 
         } catch (Exception e) {
             player.sendMessage(PluginUtils.textRed("Error : " + e.getMessage()));
         }
 
         return true;
-    }
-
-    /**
-     * Retrieves the LocalSession of the specified player.
-     *
-     * @param player The player for whom the LocalSession is retrieved.
-     * @return The LocalSession associated with the player.
-     */
-    private LocalSession getLocalSession(Player player) {
-        return WorldEdit.getInstance()
-                .getSessionManager()
-                .get(BukkitAdapter.adapt(player));
-    }
-
-    /**
-     * Retrieves the current WorldEdit region selection of the specified player.
-     *
-     * @param player The player whose selection is being retrieved.
-     * @return The selected region of the player.
-     * @throws IllegalStateException if the player has no valid selection.
-     */
-    private Region getSelection(Player player) {
-
-        return WorldEdit.getInstance()
-                .getSessionManager()
-                .get(BukkitAdapter.adapt(player))
-                .getSelection();
-    }
-
-    /**
-     * Parses and retrieves a WorldEdit pattern from the provided input.
-     *
-     * @param patternInput The string input representing the pattern.
-     * @param player       The player providing the input, used for parsing context.
-     * @return A parsed Pattern object.
-     * @throws com.sk89q.worldedit.extension.input.InputParseException if the input cannot be parsed into a valid pattern.
-     */
-    private Pattern getPattern(String patternInput, Player player) {
-        ParserContext context = new ParserContext();
-        context.setActor(BukkitAdapter.adapt(player));
-        context.setExtent(BukkitAdapter.adapt(player.getWorld()));
-
-        return WorldEdit.getInstance()
-                .getPatternFactory()
-                .parseFromInput(patternInput, context);
     }
 
     /**
@@ -177,9 +127,9 @@ public class FillHoleCommand implements CommandExecutor {
         BlockVector3 min = selection.getMinimumPoint();
         BlockVector3 max = selection.getMaximumPoint();
 
-        int dx = max.x() - min.x() + 1;
-        int dy = max.y() - min.y() + 1;
-        int dz = max.z() - min.z() + 1;
+        int dx = FaweHook.getX(max) - FaweHook.getX(min) + 1;
+        int dy = FaweHook.getY(max) - FaweHook.getY(min) + 1;
+        int dz = FaweHook.getZ(max) - FaweHook.getZ(min) + 1;
 
         boolean[][][] visited = new boolean[dx][dy][dz];
 
@@ -189,20 +139,20 @@ public class FillHoleCommand implements CommandExecutor {
         // initialise visited to false
         for (BlockVector3 block : selection) {
             if (isValidMaterial(editSession, block)) {
-                int x = block.x() - min.x();
-                int y = block.y() - min.y();
-                int z = block.z() - min.z();
+                int x = FaweHook.getX(block) - FaweHook.getX(min);
+                int y = FaweHook.getY(block) - FaweHook.getY(min);
+                int z = FaweHook.getZ(block) - FaweHook.getZ(min);
                 visited[x][y][z] = false;
             }
         }
 
         for (BlockVector3 block : selection) {
-            int x = block.x() - min.x();
-            int y = block.y() - min.y();
-            int z = block.z() - min.z();
+            int x = FaweHook.getX(block) - FaweHook.getX(min);
+            int y = FaweHook.getY(block) - FaweHook.getY(min);
+            int z = FaweHook.getZ(block) - FaweHook.getZ(min);
 
             if (!visited[x][y][z] && isValidMaterial(editSession, block)) {
-                nextVisit.add(BlockVector3.at(block.x(), block.y(), block.z()));
+                nextVisit.add(BlockVector3.at(FaweHook.getX(block), FaweHook.getY(block), FaweHook.getZ(block)));
                 visited[x][y][z] = true;
 
                 Set<BlockVector3> currentChain = new HashSet<>();
@@ -214,9 +164,9 @@ public class FillHoleCommand implements CommandExecutor {
                     currentChain.add(current);
 
                     for (BlockVector3 adjacent : getAdjacentBlocks(current)) {
-                        int adjX = adjacent.x() - min.x();
-                        int adjY = adjacent.y() - min.y();
-                        int adjZ = adjacent.z() - min.z();
+                        int adjX = FaweHook.getX(adjacent) - FaweHook.getX(min);
+                        int adjY = FaweHook.getY(adjacent) - FaweHook.getY(min);
+                        int adjZ = FaweHook.getZ(adjacent) - FaweHook.getZ(min);
 
                         // if a block in the hole touches the edge of the selection, the hole is not a hole
                         if (adjX < 0 || adjX >= dx || adjY < 0 || adjY >= dy || adjZ < 0 || adjZ >= dz) {
