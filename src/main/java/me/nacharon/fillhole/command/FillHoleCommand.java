@@ -7,6 +7,7 @@ import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
+import me.nacharon.fillhole.api.Config;
 import me.nacharon.fillhole.api.fawe.FaweHook;
 import me.nacharon.fillhole.utils.PluginUtils;
 import org.bukkit.command.Command;
@@ -73,13 +74,14 @@ public class FillHoleCommand implements CommandExecutor {
 
             // detect and fill hole
             Set<BlockVector3> blockChange = getHoleBlocks(selection, editSession);
-            FaweHook.setBlocks(blockChange, pattern, localSession, editSession);
-
-            if (blockChange.isEmpty())
-                player.sendMessage(PluginUtils.textGray("No holes were found in this selection."));
-            else
-                player.sendMessage(PluginUtils.textGray(blockChange.size() + " blocks have been filled"));
-
+            if (blockChange != null) {
+                FaweHook.setBlocks(blockChange, pattern, localSession, editSession);
+                if (blockChange.isEmpty())
+                    player.sendMessage(PluginUtils.textGray("No holes were found in this selection."));
+                else
+                    player.sendMessage(PluginUtils.textGray(blockChange.size() + " blocks have been filled"));
+            } else
+                player.sendMessage(PluginUtils.textRed("It has too many potential holes !"));
         } catch (Exception e) {
             player.sendMessage(PluginUtils.textRed("Error : " + e.getMessage()));
         }
@@ -136,6 +138,7 @@ public class FillHoleCommand implements CommandExecutor {
         Deque<BlockVector3> nextVisit = new ArrayDeque<>();
         Set<BlockVector3> change = new HashSet<>();
 
+        int nb_valid_block = 0;
         // initialise visited to false
         for (BlockVector3 block : selection) {
             if (isValidMaterial(editSession, block)) {
@@ -143,8 +146,12 @@ public class FillHoleCommand implements CommandExecutor {
                 int y = FaweHook.getY(block) - FaweHook.getY(min);
                 int z = FaweHook.getZ(block) - FaweHook.getZ(min);
                 visited[x][y][z] = false;
+                nb_valid_block++;
             }
         }
+
+        if (nb_valid_block > Config.getMaxValidBLock())
+            return null;
 
         for (BlockVector3 block : selection) {
             int x = FaweHook.getX(block) - FaweHook.getX(min);

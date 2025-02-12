@@ -1,0 +1,3 @@
+settings:
+  # Configure the max potential hole blocks
+  max_valid_blocks: 200000
