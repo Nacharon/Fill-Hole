@@ -1,6 +1,5 @@
 package me.nacharon.fillhole.command;
 
-
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
@@ -77,7 +76,7 @@ public class FillHoleCommand implements CommandExecutor {
             FaweHook.setBlocks(blockChange, pattern, localSession, editSession);
 
             if (blockChange.isEmpty())
-                player.sendMessage(PluginUtils.textGray("No holes were found within the specified size."));
+                player.sendMessage(PluginUtils.textGray("No holes were found in this selection."));
             else
                 player.sendMessage(PluginUtils.textGray(blockChange.size() + " blocks have been filled"));
 
@@ -128,9 +127,9 @@ public class FillHoleCommand implements CommandExecutor {
         BlockVector3 min = selection.getMinimumPoint();
         BlockVector3 max = selection.getMaximumPoint();
 
-        int dx = max.x() - min.x() + 1;
-        int dy = max.y() - min.y() + 1;
-        int dz = max.z() - min.z() + 1;
+        int dx = FaweHook.getX(max) - FaweHook.getX(min) + 1;
+        int dy = FaweHook.getY(max) - FaweHook.getY(min) + 1;
+        int dz = FaweHook.getZ(max) - FaweHook.getZ(min) + 1;
 
         boolean[][][] visited = new boolean[dx][dy][dz];
 
@@ -140,20 +139,20 @@ public class FillHoleCommand implements CommandExecutor {
         // initialise visited to false
         for (BlockVector3 block : selection) {
             if (isValidMaterial(editSession, block)) {
-                int x = block.x() - min.x();
-                int y = block.y() - min.y();
-                int z = block.z() - min.z();
+                int x = FaweHook.getX(block) - FaweHook.getX(min);
+                int y = FaweHook.getY(block) - FaweHook.getY(min);
+                int z = FaweHook.getZ(block) - FaweHook.getZ(min);
                 visited[x][y][z] = false;
             }
         }
 
         for (BlockVector3 block : selection) {
-            int x = block.x() - min.x();
-            int y = block.y() - min.y();
-            int z = block.z() - min.z();
+            int x = FaweHook.getX(block) - FaweHook.getX(min);
+            int y = FaweHook.getY(block) - FaweHook.getY(min);
+            int z = FaweHook.getZ(block) - FaweHook.getZ(min);
 
             if (!visited[x][y][z] && isValidMaterial(editSession, block)) {
-                nextVisit.add(BlockVector3.at(block.x(), block.y(), block.z()));
+                nextVisit.add(BlockVector3.at(FaweHook.getX(block), FaweHook.getY(block), FaweHook.getZ(block)));
                 visited[x][y][z] = true;
 
                 Set<BlockVector3> currentChain = new HashSet<>();
@@ -165,9 +164,9 @@ public class FillHoleCommand implements CommandExecutor {
                     currentChain.add(current);
 
                     for (BlockVector3 adjacent : getAdjacentBlocks(current)) {
-                        int adjX = adjacent.x() - min.x();
-                        int adjY = adjacent.y() - min.y();
-                        int adjZ = adjacent.z() - min.z();
+                        int adjX = FaweHook.getX(adjacent) - FaweHook.getX(min);
+                        int adjY = FaweHook.getY(adjacent) - FaweHook.getY(min);
+                        int adjZ = FaweHook.getZ(adjacent) - FaweHook.getZ(min);
 
                         // if a block in the hole touches the edge of the selection, the hole is not a hole
                         if (adjX < 0 || adjX >= dx || adjY < 0 || adjY >= dy || adjZ < 0 || adjZ >= dz) {

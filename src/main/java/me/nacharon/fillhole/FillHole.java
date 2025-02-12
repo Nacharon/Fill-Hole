@@ -1,6 +1,7 @@
 package me.nacharon.fillhole;
 
 
+import com.fastasyncworldedit.core.Fawe;
 import me.nacharon.fillhole.command.FillHoleCommand;
 import me.nacharon.fillhole.command.FillHoleTabCompleter;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -20,10 +21,24 @@ public final class FillHole extends JavaPlugin {
      */
     @Override
     public void onEnable() {
+        getLogger().info("===================================");
+        getLogger().info(" FillHole Plugin Loading...");
+        getLogger().info(" FAWE version: " + Fawe.instance().getVersion());
+        getLogger().info(" Minecraft version: " + getServer().getVersion());
+        getLogger().info(" Java version: " + System.getProperty("java.version"));
+
+        getLogger().info("  _____   |      |");
+        getLogger().info(" |        |      |");
+        getLogger().info(" |____    |------|");
+        getLogger().info(" |        |      |");
+        getLogger().info(" |        |      |");
+
         Objects.requireNonNull(getCommand("fillhole")).setExecutor(new FillHoleCommand());
         Objects.requireNonNull(getCommand("fillhole")).setTabCompleter(new FillHoleTabCompleter());
+        getLogger().info(" Commands Registered");
 
-        getLogger().info("Plugin FilHole is activate !");
+        getLogger().info(" Plugin FillHole is activated!");
+        getLogger().info("===================================");
     }
 
     /**
@@ -32,6 +47,14 @@ public final class FillHole extends JavaPlugin {
      */
     @Override
     public void onDisable() {
-        getLogger().info("Plugin FilHole is deactivate !");
+        getLogger().info("===================================");
+        getLogger().info(" Plugin FillHole is deactivating...");
+        getLogger().info(" Cleanup operations executed");
+        getLogger().info(" Plugin FillHole is deactivated!");
+        getLogger().info("===================================");
+    }
+
+    public static FillHole getInstance() {
+        return getPlugin(FillHole.class);
     }
 }

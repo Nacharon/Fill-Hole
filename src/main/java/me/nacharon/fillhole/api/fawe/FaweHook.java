@@ -10,9 +10,11 @@ import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
+import me.nacharon.fillhole.FillHole;
 import org.bukkit.entity.Player;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -83,7 +85,7 @@ public class FaweHook {
 
         // define context
         ParserContext context = new ParserContext();
-        context.setActor(BukkitAdapter.adapt(player));
+        context.setActor(bukkitPlayer);
         context.setWorld(bukkitPlayer.getWorld());
         context.setExtent(bukkitPlayer.getExtent());
         context.setSession(localSession);
@@ -127,8 +129,7 @@ public class FaweHook {
      * @return The Region representing the player's selection.
      */
     public static Region getSelection(Player player) {
-        return getLocalSession(player)
-                .getSelection();
+        return getLocalSession(player).getSelection();
     }
 
     /**
@@ -163,7 +164,8 @@ public class FaweHook {
      * @param localSession The LocalSession associated with the player.
      * @param editSession  The EditSession where the block changes are applied.
      */
-    public static void setBlocks(Set<BlockVector3> blocks, Pattern pattern, LocalSession localSession, EditSession editSession) {
+    public static void setBlocks(Set<BlockVector3> blocks, Pattern pattern,
+                                 LocalSession localSession, EditSession editSession) {
         try {
             editSession.setBlocks(blocks, pattern);
         } finally {
@@ -171,5 +173,58 @@ public class FaweHook {
             editSession.flushQueue();
             localSession.remember(editSession);
         }
+    }
+
+    public static String getFaweVersion() {
+        return Objects.requireNonNull(FillHole.getInstance().getServer().getPluginManager()
+                .getPlugin("WorldEdit")).getServer().getVersion();
+    }
+
+    public static boolean isFaweOlderVersion(String version) {
+
+        return isVersionOlder(getFaweVersion(), version);
+    }
+
+    private static boolean isVersionOlder(String currentVersion, String targetVersion) {
+        String[] currentParts = currentVersion.split("\\.");
+        String[] targetParts = targetVersion.split("\\.");
+
+        int length = Math.max(currentParts.length, targetParts.length);
+
+        for (int i = 0; i < length; i++) {
+            int current = i < currentParts.length ? Integer.parseInt(currentParts[i]) : 0;
+            int target = i < targetParts.length ? Integer.parseInt(targetParts[i]) : 0;
+
+            if (current < target) {
+                return true;
+            } else if (current > target) {
+                return false;
+            }
+        }
+        return false; // Versions égales
+    }
+
+    @SuppressWarnings("removal")
+    public static int getX(BlockVector3 block) {
+        if (isFaweOlderVersion("2.11.0"))
+            return block.getX();
+        else
+            return block.x();
+    }
+
+    @SuppressWarnings("removal")
+    public static int getY(BlockVector3 block) {
+        if (isFaweOlderVersion("2.11.0"))
+            return block.getY();
+        else
+            return block.y();
+    }
+
+    @SuppressWarnings("removal")
+    public static int getZ(BlockVector3 block) {
+        if (isFaweOlderVersion("2.11.0"))
+            return block.getZ();
+        else
+            return block.z();
     }
 }

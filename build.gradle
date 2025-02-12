@@ -27,8 +27,10 @@ dependencies {
     implementation platform("com.intellectualsites.bom:bom-newest:${bom_version}")
     // Centralisation de la version du BOM
     // Ref: https://github.com/IntellectualSites/bom
-    compileOnly("com.fastasyncworldedit:FastAsyncWorldEdit-Core")
-    compileOnly("com.fastasyncworldedit:FastAsyncWorldEdit-Bukkit")
+    compileOnly("com.fastasyncworldedit:FastAsyncWorldEdit-Core:${fawe_core_version}")
+    compileOnly("com.fastasyncworldedit:FastAsyncWorldEdit-Bukkit:${fawe_bukkit_version}") {
+        exclude group: "*", module: "FastAsyncWorldEdit-Core"
+    }
 }
 
 def javaVersion = java_version.toInteger()
