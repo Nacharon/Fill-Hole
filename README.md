@@ -21,6 +21,12 @@ Add 2 new mask, useful for cleaning terrain, in start of Terraforming or for fix
 
 ---
 
+## Config
+
+### `max_valid_blocks` (default : 200000)
+
+---
+
 ## Installation
 
 ### Requirements
