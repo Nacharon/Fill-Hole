@@ -9,6 +9,8 @@ This command fills the detected holes in the selected region with the specified 
 - **Usage**: Select a region using WorldEdit, then execute the command with a pattern (e.g., `stone`, `dirt`, or combinations like `stone,dirt`).  
 - **Undoable**: Changes made by the command can be reverted using WorldEdit's **undo** command.  
 
+You can also use the alias fh.
+
 ---
 
 ## Installation
