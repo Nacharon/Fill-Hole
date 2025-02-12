@@ -36,6 +36,7 @@ public final class FillHole extends JavaPlugin {
         getLogger().info(" |        |     |");
         getLogger().info(" |        |     |");
 
+        saveDefaultConfig();
         Objects.requireNonNull(getCommand("fillhole")).setExecutor(new FillHoleCommand());
         Objects.requireNonNull(getCommand("fillhole")).setTabCompleter(new FillHoleTabCompleter());
         getLogger().info(" Commands Registered");
