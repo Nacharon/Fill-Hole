@@ -1,6 +1,5 @@
 package me.nacharon.fillhole;
 
-
 import com.fastasyncworldedit.core.Fawe;
 import com.sk89q.worldedit.WorldEdit;
 import me.nacharon.fillhole.api.fawe.mask.FullCubeMaskParser;
@@ -8,6 +7,7 @@ import me.nacharon.fillhole.api.fawe.mask.TranslucentMaskParser;
 import me.nacharon.fillhole.command.FillHoleCommand;
 import me.nacharon.fillhole.command.FillHoleTabCompleter;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.Objects;
 
@@ -16,19 +16,19 @@ import java.util.Objects;
  * Main class for the FillHole plugin.
  * Handles the plugin lifecycle and command registration.
  */
-public final class FillHole extends JavaPlugin {
+public final class Main extends JavaPlugin {
 
     /**
      * Called when the plugin is enabled.
-     * Registers commands and their associated executors and tab completers.
+     * Registers commands and their associated executors and tab completer.
      */
     @Override
     public void onEnable() {
         getLogger().info("===================================");
         getLogger().info(" FillHole Plugin Loading...");
-        getLogger().info(" FAWE version: " + Fawe.instance().getVersion());
-        getLogger().info(" Minecraft version: " + getServer().getVersion());
-        getLogger().info(" Java version: " + System.getProperty("java.version"));
+        getLogger().info(" FAWE Version: " + Fawe.instance().getVersion());
+        getLogger().info(" Minecraft Version: " + getServer().getVersion());
+        getLogger().info(" Java Version: " + System.getProperty("java.version"));
 
         getLogger().info("  _____          ");
         getLogger().info(" |        |     |");
@@ -36,23 +36,39 @@ public final class FillHole extends JavaPlugin {
         getLogger().info(" |        |     |");
         getLogger().info(" |        |     |");
 
+        getLogger().info(" Loading Config ...");
+        // 5 minutes
+        long reloadDelay = 20 * 60 * 5;
         saveDefaultConfig();
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                reloadConfig();
+            }
+        }.runTaskTimerAsynchronously(getInstance(), reloadDelay, reloadDelay);
+        getLogger().info(" Config Loaded !");
+
+        getLogger().info(" Registering Commands ...");
         Objects.requireNonNull(getCommand("fillhole")).setExecutor(new FillHoleCommand());
         Objects.requireNonNull(getCommand("fillhole")).setTabCompleter(new FillHoleTabCompleter());
-        getLogger().info(" Commands Registered");
+        getLogger().info(" FillHole command Registered !");
 
-        getLogger().info(" Registering custom FAWE masks...");
+        getLogger().info(" FillHoleTask command Registered !");
+
+        getLogger().info(" All Commands Registered !");
+
+        getLogger().info(" Registering Custom FAWE Masks ...");
 
         WorldEdit worldEdit = WorldEdit.getInstance();
         worldEdit.getMaskFactory().register(new FullCubeMaskParser(worldEdit));
-        getLogger().info(" FullCubeMask registered!");
+        getLogger().info(" FullCubeMask Registered !");
 
         worldEdit.getMaskFactory().register(new TranslucentMaskParser(worldEdit));
-        getLogger().info(" TranslucentMask registered!");
+        getLogger().info(" TranslucentMask Registered !");
 
-        getLogger().info(" All mask are registered!");
+        getLogger().info(" All Mask are Registered !");
 
-        getLogger().info(" Plugin FillHole is activated!");
+        getLogger().info(" Plugin FillHole is activated !");
         getLogger().info("===================================");
     }
 
@@ -69,7 +85,12 @@ public final class FillHole extends JavaPlugin {
         getLogger().info("===================================");
     }
 
-    public static FillHole getInstance() {
-        return getPlugin(FillHole.class);
+    /**
+     * Gets the instance of the main plugin.
+     *
+     * @return The main plugin instance.
+     */
+    public static Main getInstance() {
+        return getPlugin(Main.class);
     }
 }

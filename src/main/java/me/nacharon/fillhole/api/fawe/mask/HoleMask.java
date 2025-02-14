@@ -5,17 +5,18 @@ import com.sk89q.worldedit.function.mask.BlockMask;
 import com.sk89q.worldedit.function.mask.Mask;
 
 /**
- * A mask that filters only full cube blocks.
+ * A mask that filters non-full cube or translucent blocks.
  */
-public class FullCubeMask extends BlockMask {
+public class HoleMask extends BlockMask {
     /**
-     * Constructs a FullCubeMask for a given extent.
+     * Constructs a HoleMask for a given extent.
      *
      * @param extent The extent to apply the mask to.
      */
-    public FullCubeMask(Extent extent) {
+
+    public HoleMask(Extent extent) {
         super(extent);
-        add(state -> state.getMaterial().isFullCube());
+        add(state -> !state.getMaterial().isFullCube() || state.getMaterial().isTranslucent());
     }
 
     /**

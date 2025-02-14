@@ -42,12 +42,9 @@ public class FillHoleTabCompleter implements TabCompleter {
                     } catch (InputParseException e) {
                         player.sendMessage(PluginUtils.textRed("Error : " + e.getMessage()));
                     }
-                    // add pattern suggestions
-                    return completions;
                 }
             }
         }
-
         return completions;
     }
 }
