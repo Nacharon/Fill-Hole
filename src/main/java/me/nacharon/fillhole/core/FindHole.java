@@ -12,8 +12,9 @@ import me.nacharon.fillhole.api.Config;
 import me.nacharon.fillhole.api.fawe.FaweHook;
 import me.nacharon.fillhole.api.fawe.mask.HoleMask;
 import me.nacharon.fillhole.command.FillHoleCommand;
-import me.nacharon.fillhole.utils.PluginUtils;
 import me.nacharon.fillhole.utils.ProgressBar;
+import me.nacharon.fillhole.utils.TextUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -129,10 +130,10 @@ public class FindHole {
                 if (nbVisitedBlock >= nbValidBlock) {
                     ProgressBar.sendProgressBar(player, "Search Hole", nbValidBlock, nbVisitedBlock);
                     if (change.isEmpty())
-                        player.sendMessage(PluginUtils.textGray("No holes were found in this selection."));
+                        player.sendMessage(TextUtils.textGray("No holes were found in this selection."));
                     else {
                         FaweHook.setBlocks(change, pattern, localSession, editSession);
-                        player.sendMessage(PluginUtils.textGreen(change.size() + " blocks have been filled"));
+                        player.sendMessage(TextUtils.textGreen(change.size() + " blocks have been filled"));
                     }
                     FillHoleCommand.removeTask(player);
                     cancel();
@@ -143,28 +144,37 @@ public class FindHole {
         BukkitRunnable initTask = new BukkitRunnable() {
             @Override
             public void run() {
-                if (subTaskFinish) {
-                    ProgressBar.sendProgressBar(player, "Filter Block", selectionSize, nbVisitedBlock);
-                    subTaskFinish = false;
-                    int count = 0;
-                    while (selectionIterator.hasNext() && count < initMaxCycle) {
-                        BlockVector3 pos = selectionIterator.next();
-                        if (mask.test(pos)) {
-                            filteredBlocks.add(new BlockInfo(pos));
-                        }
-                        count++;
-                    }
-                    nbVisitedBlock += count;
-                    subTaskFinish = true;
-                    if (!selectionIterator.hasNext()) {
+                try {
+                    if (subTaskFinish) {
                         ProgressBar.sendProgressBar(player, "Filter Block", selectionSize, nbVisitedBlock);
+                        subTaskFinish = false;
+                        int count = 0;
+                        while (selectionIterator.hasNext() && count < initMaxCycle) {
+                            BlockVector3 pos = selectionIterator.next();
+                            if (mask.test(pos)) {
+                                filteredBlocks.add(new BlockInfo(pos));
+                            }
+                            count++;
+                        }
+                        nbVisitedBlock += count;
+                        subTaskFinish = true;
+                        if (!selectionIterator.hasNext()) {
+                            ProgressBar.sendProgressBar(player, "Filter Block", selectionSize, nbVisitedBlock);
 
-                        nbVisitedBlock = 0;
-                        nbValidBlock = filteredBlocks.size();
+                            nbVisitedBlock = 0;
+                            nbValidBlock = filteredBlocks.size();
 
-                        findHoleTask.runTaskTimer(Main.getInstance(), 1L, fillHoleTaskDelay);
-                        cancel();
+                            findHoleTask.runTaskTimer(Main.getInstance(), 1L, fillHoleTaskDelay);
+                            cancel();
+                        }
                     }
+                } catch (OutOfMemoryError error) {
+                    Bukkit.getLogger().severe("Out of memory error detected! Cancelling fillhole command...");
+                    player.sendMessage(TextUtils.textRed("The selection is too big, the command are cancel"));
+
+                    filteredBlocks.clear();
+                    FillHoleCommand.removeTask(player);
+                    cancel();
                 }
             }
         };

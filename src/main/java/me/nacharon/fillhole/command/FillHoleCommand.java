@@ -4,9 +4,11 @@ import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.regions.Region;
+import me.nacharon.fillhole.api.Config;
 import me.nacharon.fillhole.api.fawe.FaweHook;
 import me.nacharon.fillhole.core.FindHole;
-import me.nacharon.fillhole.utils.PluginUtils;
+import me.nacharon.fillhole.utils.ErrorUtils;
+import me.nacharon.fillhole.utils.TextUtils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -38,24 +40,24 @@ public class FillHoleCommand implements CommandExecutor {
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
         // check if the sender is a player
         if (!(sender instanceof Player player)) {
-            sender.sendMessage(PluginUtils.textRed("This command must be executed by a player!"));
+            sender.sendMessage(TextUtils.textRed("This command must be executed by a player!"));
             return true;
         }
 
         // check if the player has permission to use this command
         if (!player.hasPermission("fillhole.use")) {
-            player.sendMessage(PluginUtils.textRed("You do not have permission to use this command."));
+            player.sendMessage(TextUtils.textRed("You do not have permission to use this command."));
             return true;
         }
 
         // check that the command is used correctly
         if (args.length < 1) {
-            player.sendMessage(PluginUtils.textRed("Usage: /fillhole <pattern>"));
+            player.sendMessage(TextUtils.textRed("Usage: /fillhole <pattern>"));
             return true;
         }
 
         if (playerTasks.containsKey(player.getUniqueId())) {
-            player.sendMessage(PluginUtils.textRed("One action is already in progress"));
+            player.sendMessage(TextUtils.textRed("One action is already in progress"));
             return true;
         }
 
@@ -71,21 +73,24 @@ public class FillHoleCommand implements CommandExecutor {
             try {
                 selection = FaweHook.getSelection(localSession);
             } catch (Exception e) {
-                player.sendMessage(PluginUtils.textRed("Please select a cuboid selection first!"));
+                player.sendMessage(TextUtils.textRed("Please select a cuboid selection first!"));
                 return true;
             }
 
             // get FAWE edit session
             EditSession editSession = FaweHook.getEditSession(player, localSession);
 
-            FindHole findHole = new FindHole(selection, editSession);
-            playerTasks.put(player.getUniqueId(), findHole);
-            findHole.fillHoleBlocks(player, localSession, pattern);
+            int maxSelectionSize = Config.getMaxSelectionSize();
+            if (selection.getVolume() <= maxSelectionSize) {
+                FindHole findHole = new FindHole(selection, editSession);
+                playerTasks.put(player.getUniqueId(), findHole);
+                findHole.fillHoleBlocks(player, localSession, pattern);
+            } else
+                player.sendMessage(TextUtils.textRed("The selection is too big, the max size is " + maxSelectionSize + " blocks"));
 
         } catch (Exception e) {
-            player.sendMessage(PluginUtils.textRed("Error : " + e.getMessage()));
+            ErrorUtils.errorMessage(e, player);
         }
-
         return true;
     }
 

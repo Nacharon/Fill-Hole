@@ -3,7 +3,7 @@ package me.nacharon.fillhole.command;
 
 import com.sk89q.worldedit.extension.input.InputParseException;
 import me.nacharon.fillhole.api.fawe.FaweHook;
-import me.nacharon.fillhole.utils.PluginUtils;
+import me.nacharon.fillhole.utils.ErrorUtils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
@@ -40,7 +40,7 @@ public class FillHoleTabCompleter implements TabCompleter {
                     try {
                         completions = FaweHook.getPatternSuggestions(args[0], player);
                     } catch (InputParseException e) {
-                        player.sendMessage(PluginUtils.textRed("Error : " + e.getMessage()));
+                        ErrorUtils.errorMessage(e, player);
                     }
                 }
             }

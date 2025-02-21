@@ -8,6 +8,24 @@ import me.nacharon.fillhole.Main;
 public class Config {
 
     /**
+     * Gets the config reload delay value.
+     *
+     * @return The delay of config reload.
+     */
+    public static long getReloadDelay() {
+        return Main.getInstance().getConfig().getLong("settings.reload_delay", 20 * 60 * 5);
+    }
+
+    /**
+     * Retrieves the maximum selection size allowed for operations.
+     *
+     * @return The maximum selection size as defined in the configuration.
+     */
+    public static int getMaxSelectionSize() {
+        return Main.getInstance().getConfig().getInt("settings.max_selection_size", 10000000);
+    }
+
+    /**
      * Gets the initial processed cycle value for filtering.
      *
      * @return The number of cycles.

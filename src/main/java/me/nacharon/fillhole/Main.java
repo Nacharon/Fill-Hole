@@ -2,6 +2,7 @@ package me.nacharon.fillhole;
 
 import com.fastasyncworldedit.core.Fawe;
 import com.sk89q.worldedit.WorldEdit;
+import me.nacharon.fillhole.api.Config;
 import me.nacharon.fillhole.api.fawe.mask.FullCubeMaskParser;
 import me.nacharon.fillhole.api.fawe.mask.TranslucentMaskParser;
 import me.nacharon.fillhole.command.FillHoleCommand;
@@ -36,37 +37,9 @@ public final class Main extends JavaPlugin {
         getLogger().info(" |        |     |");
         getLogger().info(" |        |     |");
 
-        getLogger().info(" Loading Config ...");
-        // 5 minutes
-        long reloadDelay = 20 * 60 * 5;
-        saveDefaultConfig();
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                reloadConfig();
-            }
-        }.runTaskTimerAsynchronously(getInstance(), reloadDelay, reloadDelay);
-        getLogger().info(" Config Loaded !");
-
-        getLogger().info(" Registering Commands ...");
-        Objects.requireNonNull(getCommand("fillhole")).setExecutor(new FillHoleCommand());
-        Objects.requireNonNull(getCommand("fillhole")).setTabCompleter(new FillHoleTabCompleter());
-        getLogger().info(" FillHole command Registered !");
-
-        getLogger().info(" FillHoleTask command Registered !");
-
-        getLogger().info(" All Commands Registered !");
-
-        getLogger().info(" Registering Custom FAWE Masks ...");
-
-        WorldEdit worldEdit = WorldEdit.getInstance();
-        worldEdit.getMaskFactory().register(new FullCubeMaskParser(worldEdit));
-        getLogger().info(" FullCubeMask Registered !");
-
-        worldEdit.getMaskFactory().register(new TranslucentMaskParser(worldEdit));
-        getLogger().info(" TranslucentMask Registered !");
-
-        getLogger().info(" All Mask are Registered !");
+        loadConfig();
+        commandRegister();
+        maskRegister();
 
         getLogger().info(" Plugin FillHole is activated !");
         getLogger().info("===================================");
@@ -92,5 +65,52 @@ public final class Main extends JavaPlugin {
      */
     public static Main getInstance() {
         return getPlugin(Main.class);
+    }
+
+    /**
+     * Loads the plugin configuration and sets up automatic reloading.
+     */
+    private void loadConfig() {
+        getLogger().info(" Loading Config ...");
+
+        saveDefaultConfig();
+        long reloadDelay = Config.getReloadDelay();
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                reloadConfig();
+            }
+        }.runTaskTimerAsynchronously(getInstance(), reloadDelay, reloadDelay);
+
+        getLogger().info(" Config Loaded !");
+    }
+
+    /**
+     * Registers the commands for the plugin.
+     */
+    private void commandRegister() {
+        getLogger().info(" Registering Commands ...");
+
+        Objects.requireNonNull(getCommand("fillhole")).setExecutor(new FillHoleCommand());
+        Objects.requireNonNull(getCommand("fillhole")).setTabCompleter(new FillHoleTabCompleter());
+
+        getLogger().info(" FillHole command Registered !");
+        getLogger().info(" All Commands Registered !");
+    }
+
+    /**
+     * Registers custom FAWE masks.
+     */
+    private void maskRegister() {
+        getLogger().info(" Registering Custom FAWE Masks ...");
+
+        WorldEdit worldEdit = WorldEdit.getInstance();
+        worldEdit.getMaskFactory().register(new FullCubeMaskParser(worldEdit));
+        getLogger().info(" FullCubeMask Registered !");
+
+        worldEdit.getMaskFactory().register(new TranslucentMaskParser(worldEdit));
+        getLogger().info(" TranslucentMask Registered !");
+
+        getLogger().info(" All Mask are Registered !");
     }
 }

@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
  * Utility class for creating colored text components.
  * Provides helper methods to generate text in different colors.
  */
-public class PluginUtils {
+public class TextUtils {
 
     /**
      * Creates a red-colored text component.
