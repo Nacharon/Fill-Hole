@@ -10,7 +10,7 @@ import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
-import me.nacharon.fillhole.FillHole;
+import me.nacharon.fillhole.Main;
 import org.bukkit.entity.Player;
 
 import java.util.List;
@@ -175,16 +175,33 @@ public class FaweHook {
         }
     }
 
+    /**
+     * Retrieves the FAWE (Fast Async WorldEdit) version currently installed on the server.
+     *
+     * @return The FAWE version as a string.
+     */
     public static String getFaweVersion() {
-        return Objects.requireNonNull(FillHole.getInstance().getServer().getPluginManager()
+        return Objects.requireNonNull(Main.getInstance().getServer().getPluginManager()
                 .getPlugin("WorldEdit")).getServer().getVersion();
     }
 
+    /**
+     * Checks if the installed FAWE version is older than a specified version.
+     *
+     * @param version The version to compare against.
+     * @return True if the installed FAWE version is older, otherwise false.
+     */
     public static boolean isFaweOlderVersion(String version) {
-
         return isVersionOlder(getFaweVersion(), version);
     }
 
+    /**
+     * Compares two version strings and determines if the current version is older than the target version.
+     *
+     * @param currentVersion The current version string.
+     * @param targetVersion  The target version string to compare against.
+     * @return True if the current version is older, otherwise false.
+     */
     private static boolean isVersionOlder(String currentVersion, String targetVersion) {
         String[] currentParts = currentVersion.split("\\.");
         String[] targetParts = targetVersion.split("\\.");
@@ -201,9 +218,15 @@ public class FaweHook {
                 return false;
             }
         }
-        return false; // Versions égales
+        return false;
     }
 
+    /**
+     * Retrieves the X coordinate of a given block, adapting to FAWE version differences.
+     *
+     * @param block The BlockVector3 block.
+     * @return The X coordinate of the block.
+     */
     @SuppressWarnings("removal")
     public static int getX(BlockVector3 block) {
         if (isFaweOlderVersion("2.11.0"))
@@ -212,6 +235,12 @@ public class FaweHook {
             return block.x();
     }
 
+    /**
+     * Retrieves the Y coordinate of a given block, adapting to FAWE version differences.
+     *
+     * @param block The BlockVector3 block.
+     * @return The Y coordinate of the block.
+     */
     @SuppressWarnings("removal")
     public static int getY(BlockVector3 block) {
         if (isFaweOlderVersion("2.11.0"))
@@ -220,6 +249,12 @@ public class FaweHook {
             return block.y();
     }
 
+    /**
+     * Retrieves the Z coordinate of a given block, adapting to FAWE version differences.
+     *
+     * @param block The BlockVector3 block.
+     * @return The Z coordinate of the block.
+     */
     @SuppressWarnings("removal")
     public static int getZ(BlockVector3 block) {
         if (isFaweOlderVersion("2.11.0"))
