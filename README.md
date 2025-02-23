@@ -1,37 +1,53 @@
 # Fill Hole Plugin
 
-**Fill Hole** is a Minecraft plugin designed to make filling holes in a selected region easy and efficient. It integrates with WorldEdit and leverages the FAWE API for optimal performance.
+**Fill Hole** is a Minecraft plugin designed to efficiently fill holes in a selected region.  
+It integrates with **WorldEdit** and leverages the **FAWE API** for optimal performance.
 
 ## Main Command
 
 ### `/fillhole <pattern>`
-This command fills the detected holes in the selected region with the specified pattern.  
+This command detects and fills holes in the selected region with the specified pattern.  
 - **Usage**: Select a region using WorldEdit, then execute the command with a pattern (e.g., `stone`, `dirt`, or combinations like `stone,dirt`).  
 - **Undoable**: Changes made by the command can be reverted using WorldEdit's **undo** command.  
+- **Task-Based Execution**: Uses Bukkit tasks to handle large regions without crashing.  
+- **Progress Bar**: Displays completion status while filling holes.  
 
-You can also use the alias `fh`.
+You can also use the alias `/fh`.
 
-## New Mask
+## New Masks
 
 ### `#translucent`
+Filters out translucent blocks when selecting terrain.
 
 ### `#full_cube`
+Filters blocks to include only full cubes, useful for terrain cleanup.
 
-Add 2 new mask, useful for cleaning terrain, in start of Terraforming or for fix some hole
+These masks are useful when starting **Terraforming** or fixing broken terrain.
 
 ---
 
-## Config
+## Configuration
 
-### `max_valid_blocks` (default : 200000)
+### `max_selection_size` (default: **10,000,000**)  
+Defines the maximum allowed selection size.
+
+### `reload_delay` (default: **5 minutes**)  
+Controls how often the configuration auto-reloads.
+
+### Task Control Settings
+These options optimize performance by controlling processing cycles:  
+- `filter_processed_cycle`
+- `filter_tick_cycle`
+- `fill_hole_processed_cycle`
+- `fill_hole_tick_cycle`
 
 ---
 
 ## Installation
 
 ### Requirements
-- **Minecraft Paper Server**: Version 1.20.6 or later (not test).
-- **FAWE (Fast Async WorldEdit)**: Ensure FAWE is installed.
+- **Minecraft Paper Server**: Version **1.20.6 or later** *(not fully tested)*.
+- **FAWE (Fast Async WorldEdit)**: Ensure **FAWE** is installed.
 
 ### Steps
 1. Download the `.jar` file from [the releases page](https://modrinth.com/plugin/fill-hole/versions).
@@ -43,7 +59,7 @@ Add 2 new mask, useful for cleaning terrain, in start of Terraforming or for fix
 ## Permissions
 
 - **`fillhole.use`**: Required to execute the `/fillhole` command.  
-  Players without this permission will receive a message indicating they lack the required permissions.
+  Players without this permission will receive an error message.
 
 ---
 
@@ -58,4 +74,4 @@ Add 2 new mask, useful for cleaning terrain, in start of Terraforming or for fix
 ## Author
 
 Developed by **Nacharon**.  
-For questions or support, please use the issue tracker.
+For questions or support, please use the **issue tracker**.
