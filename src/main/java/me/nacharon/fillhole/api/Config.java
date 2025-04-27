@@ -26,30 +26,12 @@ public class Config {
     }
 
     /**
-     * Gets the initial processed cycle value for filtering.
-     *
-     * @return The number of cycles.
-     */
-    public static int getInitProcessedCycle() {
-        return Main.getInstance().getConfig().getInt("settings.filter_processed_cycle", 1000000);
-    }
-
-    /**
-     * Gets the initial tick cycle value for filtering.
-     *
-     * @return The tick cycle duration.
-     */
-    public static long getInitTickCycle() {
-        return Main.getInstance().getConfig().getLong("settings.filter_tick_cycle", 5L);
-    }
-
-    /**
      * Gets the processed cycle value for filling holes.
      *
      * @return The number of cycles.
      */
     public static int getFillHoleProcessedCycle() {
-        return Main.getInstance().getConfig().getInt("settings.fill_hole_processed_cycle", 100000);
+        return Main.getInstance().getConfig().getInt("settings.fill_hole_processed_cycle", 10000);
     }
 
     /**
@@ -58,6 +40,10 @@ public class Config {
      * @return The tick cycle duration.
      */
     public static long getFillHoleTickCycle() {
-        return Main.getInstance().getConfig().getLong("settings.fill_hole_tick_cycle", 40L);
+        return Main.getInstance().getConfig().getLong("settings.fill_hole_tick_cycle", 1L);
+    }
+
+    public static long getTaskBarDelay() {
+        return Main.getInstance().getConfig().getLong("settings.task_bar_delay", 30L);
     }
 }

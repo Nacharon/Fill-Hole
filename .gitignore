@@ -46,9 +46,6 @@ desktop.ini
 # Dependency caches
 **/libs/
 
-# JAR files
-*.jar
-
 # Logs and crash reports
 logs/
 crash-reports/
