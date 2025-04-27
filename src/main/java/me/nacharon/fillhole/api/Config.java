@@ -43,6 +43,11 @@ public class Config {
         return Main.getInstance().getConfig().getLong("settings.fill_hole_tick_cycle", 1L);
     }
 
+    /**
+     * Gets the delay for sending the progress bar.
+     *
+     * @return The delay on tick.
+     */
     public static long getTaskBarDelay() {
         return Main.getInstance().getConfig().getLong("settings.task_bar_delay", 30L);
     }
