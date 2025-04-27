@@ -6,10 +6,8 @@ settings:
   # Configure max selection size
   max_selection_size: 10000000
 
-  # Configure filtering selection task
-  filter_processed_cycle: 2500000
-  filter_tick_cycle: 20
-
   # Configure searching hole task
-  fill_hole_processed_cycle: 100000
-  fill_hole_tick_cycle: 30
+  fill_hole_processed_cycle: 10000
+  fill_hole_tick_cycle: 1
+
+  task_bar_delay: 30
