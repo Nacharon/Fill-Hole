@@ -9,11 +9,10 @@ It integrates with **WorldEdit** and leverages the **FAWE API** for optimal perf
 
 This command detects and fills holes in the selected region with the specified pattern.
 
-- **Usage**: Select a region using WorldEdit, then execute the command with a pattern (e.g., `stone`, `dirt`, or
-  combinations like `stone,dirt`).
-- **Undoable**: Changes made by the command can be reverted using WorldEdit's **undo** command.
-- **Task-Based Execution**: Uses Bukkit tasks to handle large regions without crashing.
-- **Progress Bar**: Displays completion status while filling holes.
+- **Usage**: Select a region using WorldEdit, then execute the command with a pattern (e.g., `stone`, `dirt`, or combinations like `stone,dirt`).  
+- **Undoable**: Changes made by the command can be reverted using WorldEdit's **undo** command.  
+- **Task-Based Execution**: Uses Bukkit tasks to handle large regions without crashing.  
+- **Progress Bar**: Displays completion status while filling holes.  
 
 You can also use the alias `/fh`.
 
