@@ -16,6 +16,14 @@ This command detects and fills holes in the selected region with the specified p
 
 You can also use the alias `/fh`.
 
+## Extend Cuboid Selection
+
+You can extend a WorldEdit selection when you hold the WorldEdit wand, it works like the Axiom's selection.
+
+### `/extendsel <enable | disable>`
+
+The command allow to enable/disable the extending selection features
+
 ## New Masks
 
 ### `#translucent`
@@ -47,6 +55,10 @@ These options optimize performance by controlling processing cycles:
 - `fill_hole_processed_cycle`
 - `fill_hole_tick_cycle`
 - `task_bar_delay`
+
+### `tag.disable_extend_selection` (default: **fillhole_disable_extend_sel**)
+
+You can modify the tag that disable the extending selection features option with this option 
 
 ---
 
