@@ -4,6 +4,7 @@ import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
+import me.nacharon.fillhole.api.Config;
 import me.nacharon.fillhole.api.fawe.FaweHook;
 import org.bukkit.GameMode;
 import org.bukkit.block.Block;
@@ -19,6 +20,7 @@ public class OnBlockPick implements Listener {
         Player player = pickBlockEvent.getPlayer();
 
         if (!player.hasPermission("fillhole.selection.extend")) return;
+        if (player.getScoreboardTags().contains(Config.getDisableExpendTag())) return;
         if (player.getGameMode() != GameMode.CREATIVE) return;
         if (player.isSneaking()) return;
 

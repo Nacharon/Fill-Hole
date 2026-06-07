@@ -15,6 +15,13 @@ commands:
       fillhole.use:
         description: Allows to use the /fillhole command
         default: op
+  extendsel:
+    description: Disable/Enable the extend selection on pick block
+    usage: /extendsel <enable|disable>
+    permissions:
+      fillhole.selection.extend:
+        description: Allows to use the /fillhole command
+        default: op
 
 permissions:
   fillhole.use:

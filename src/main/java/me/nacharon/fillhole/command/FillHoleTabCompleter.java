@@ -9,6 +9,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,13 +30,11 @@ public class FillHoleTabCompleter implements TabCompleter {
      * @return A list of suggestions for tab completion.
      */
     @Override
-    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, String[] args) {
+    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, String @NonNull [] args) {
         List<String> completions = new ArrayList<>();
 
         if (sender instanceof Player player) {
-
             if (player.hasPermission("fillhole.use")) {
-
                 if (args.length == 1) {
                     try {
                         completions = FaweHook.getPatternSuggestions(args[0], player);

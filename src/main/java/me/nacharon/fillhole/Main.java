@@ -5,6 +5,7 @@ import com.sk89q.worldedit.WorldEdit;
 import me.nacharon.fillhole.api.Config;
 import me.nacharon.fillhole.api.fawe.mask.FullCubeMaskParser;
 import me.nacharon.fillhole.api.fawe.mask.TranslucentMaskParser;
+import me.nacharon.fillhole.command.ExtendSelection;
 import me.nacharon.fillhole.command.FillHoleCommand;
 import me.nacharon.fillhole.command.FillHoleTabCompleter;
 import me.nacharon.fillhole.event.OnBlockPick;
@@ -107,6 +108,9 @@ public final class Main extends JavaPlugin {
 
         Objects.requireNonNull(getCommand("fillhole")).setExecutor(new FillHoleCommand());
         Objects.requireNonNull(getCommand("fillhole")).setTabCompleter(new FillHoleTabCompleter());
+
+        Objects.requireNonNull(getCommand("extendsel")).setExecutor(new ExtendSelection());
+        Objects.requireNonNull(getCommand("extendsel")).setTabCompleter(new ExtendSelection());
 
         getLogger().info(" FillHole command Registered !");
         getLogger().info(" All Commands Registered !");
