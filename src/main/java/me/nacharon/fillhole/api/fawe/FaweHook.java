@@ -3,6 +3,7 @@ package me.nacharon.fillhole.api.fawe;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.BukkitPlayer;
 import com.sk89q.worldedit.extension.factory.PatternFactory;
@@ -10,8 +11,12 @@ import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.regions.RegionSelector;
+import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
+import com.sk89q.worldedit.world.item.ItemType;
 import me.nacharon.fillhole.Main;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 import java.util.Objects;
@@ -31,6 +36,16 @@ public class FaweHook {
      */
     public static BukkitPlayer getBukkitPlayer(Player player) {
         return BukkitAdapter.adapt(player);
+    }
+
+    /**
+     * Converts a Bukkit {@link Player} to a WorldEdit {@link BukkitPlayer}.
+     *
+     * @param item The item to convert.
+     * @return The corresponding WorldEdit BukkitPlayer.
+     */
+    public static ItemType getItemType(ItemStack item) {
+        return BukkitAdapter.asItemType(item.getType());
     }
 
     /**
@@ -140,6 +155,27 @@ public class FaweHook {
      */
     public static Region getSelection(LocalSession session) {
         return session.getSelection();
+    }
+
+    /**
+     * Retrieves the current WorldEdit selection for a given LocalSession.
+     *
+     * @param session The LocalSession from which to retrieve the selection.
+     * @param player The LocalSession from which to retrieve the selection.
+     * @return The Region representing the selection.
+     */
+    public static RegionSelector getRegionSelection(LocalSession session, Player player) {
+        return session.getRegionSelector(getBukkitPlayer(player).getWorld());
+    }
+
+    /**
+     * Retrieves the current WorldEdit selection for a given player.
+     *
+     * @param player The player whose selection is retrieved.
+     * @return The Region representing the player's selection.
+     */
+    public static RegionSelector getRegionSelection(Player player) {
+        return getRegionSelection(getLocalSession(player), player);
     }
 
     /**
@@ -261,5 +297,58 @@ public class FaweHook {
             return block.getZ();
         else
             return block.z();
+    }
+
+    public static boolean isHoldingSelectionWand(Player player, LocalSession session) {
+        ItemType mainHand = getItemType(player.getInventory().getItemInMainHand());
+        if (mainHand == null) return false;
+
+        BaseItem wandTool = session.getWandBaseItem();
+        if (wandTool == null) return false;
+
+        return wandTool.getType().equals(mainHand);
+    }
+
+    public static boolean isHoldingSelectionWand(Player player) {
+        return isHoldingSelectionWand(player, getLocalSession(player));
+    }
+
+    public static void extendSelection(CuboidRegionSelector selection, BlockVector3 position) {
+        BlockVector3 pos1 = selection.getPrimaryPosition();
+        BlockVector3 pos2 = selection.getIncompleteRegion().getPos2();
+
+        BlockVector3 newPos1 = BlockVector3.at(
+                extendCord(pos1.x(), pos2.x(), position.x()),
+                extendCord(pos1.y(), pos2.y(), position.y()),
+                extendCord(pos1.z(), pos2.z(), position.z())
+        );
+        BlockVector3 newPos2 = BlockVector3.at(
+                extendCordOpposite(pos2.x(), pos1.x(), position.x()),
+                extendCordOpposite(pos2.y(), pos1.y(), position.y()),
+                extendCordOpposite(pos2.z(), pos1.z(), position.z())
+        );
+
+        selection.selectPrimary(newPos1, null);
+        selection.selectSecondary(newPos2, null);
+    }
+
+    private static int extendCord(int pos1, int pos2, int pos3) {
+        if (pos1 == pos2) return pos1;
+        if (pos1 <= pos2) {
+            return Math.min(pos1, pos3);
+        }
+        else {
+            return Math.max(pos1, pos3);
+        }
+    }
+
+    private static int extendCordOpposite(int pos1, int pos2, int pos3) {
+        if (pos1 == pos2) return pos3;
+        if (pos1 <= pos2) {
+            return Math.min(pos1, pos3);
+        }
+        else {
+            return Math.max(pos1, pos3);
+        }
     }
 }

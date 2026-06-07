@@ -7,6 +7,7 @@ import me.nacharon.fillhole.api.fawe.mask.FullCubeMaskParser;
 import me.nacharon.fillhole.api.fawe.mask.TranslucentMaskParser;
 import me.nacharon.fillhole.command.FillHoleCommand;
 import me.nacharon.fillhole.command.FillHoleTabCompleter;
+import me.nacharon.fillhole.event.OnBlockPick;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -38,6 +39,7 @@ public final class Main extends JavaPlugin {
         getLogger().info(" |        |     |");
 
         loadConfig();
+        eventRegister();
         commandRegister();
         maskRegister();
 
@@ -83,6 +85,18 @@ public final class Main extends JavaPlugin {
         }.runTaskTimerAsynchronously(getInstance(), reloadDelay, reloadDelay);
 
         getLogger().info(" Config Loaded !");
+    }
+
+    /**
+     * Registers the event listener for the plugin.
+     */
+    private void eventRegister() {
+        getLogger().info(" Registering Event Listener ...");
+
+        getServer().getPluginManager().registerEvents(new OnBlockPick(), this);
+
+        getLogger().info(" BlockPick Event Listener Registered !");
+        getLogger().info(" All Event Listener Registered !");
     }
 
     /**
