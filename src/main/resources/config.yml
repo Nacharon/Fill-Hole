@@ -11,3 +11,8 @@ settings:
   fill_hole_tick_cycle: 1
 
   task_bar_delay: 30
+
+# Configure scoreboard tags
+tags:
+  # Configure the tag that define if extend selection on pick block is enable
+  disable_extend_selection: "fillhole_disable_extend_sel"

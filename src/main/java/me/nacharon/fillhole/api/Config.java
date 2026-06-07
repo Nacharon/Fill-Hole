@@ -51,4 +51,13 @@ public class Config {
     public static long getTaskBarDelay() {
         return Main.getInstance().getConfig().getLong("settings.task_bar_delay", 30L);
     }
+
+    /**
+     * Gets the delay for sending the progress bar.
+     *
+     * @return The delay on tick.
+     */
+    public static String getDisableExpendTag() {
+        return Main.getInstance().getConfig().getString("tags.disable_extend_selection", "fillhole_disable_extend_sel");
+    }
 }

@@ -14,6 +14,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -37,7 +38,7 @@ public class FillHoleCommand implements CommandExecutor {
      * @return true if the command was executed successfully, false otherwise
      */
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String @NonNull [] args) {
         // check if the sender is a player
         if (!(sender instanceof Player player)) {
             sender.sendMessage(TextUtils.textRed("This command must be executed by a player!"));

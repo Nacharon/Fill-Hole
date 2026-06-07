@@ -106,7 +106,6 @@ public class FindHole {
      * @return True if the material is translucent or not a full cube.
      */
     public boolean isValidMaterial(BlockVector3 block) {
-
         return mask.test(block);
     }
 

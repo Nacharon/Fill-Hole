@@ -5,8 +5,10 @@ import com.sk89q.worldedit.WorldEdit;
 import me.nacharon.fillhole.api.Config;
 import me.nacharon.fillhole.api.fawe.mask.FullCubeMaskParser;
 import me.nacharon.fillhole.api.fawe.mask.TranslucentMaskParser;
+import me.nacharon.fillhole.command.ExtendSelection;
 import me.nacharon.fillhole.command.FillHoleCommand;
 import me.nacharon.fillhole.command.FillHoleTabCompleter;
+import me.nacharon.fillhole.event.OnBlockPick;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -38,6 +40,7 @@ public final class Main extends JavaPlugin {
         getLogger().info(" |        |     |");
 
         loadConfig();
+        eventRegister();
         commandRegister();
         maskRegister();
 
@@ -86,6 +89,18 @@ public final class Main extends JavaPlugin {
     }
 
     /**
+     * Registers the event listener for the plugin.
+     */
+    private void eventRegister() {
+        getLogger().info(" Registering Event Listener ...");
+
+        getServer().getPluginManager().registerEvents(new OnBlockPick(), this);
+
+        getLogger().info(" BlockPick Event Listener Registered !");
+        getLogger().info(" All Event Listener Registered !");
+    }
+
+    /**
      * Registers the commands for the plugin.
      */
     private void commandRegister() {
@@ -93,6 +108,9 @@ public final class Main extends JavaPlugin {
 
         Objects.requireNonNull(getCommand("fillhole")).setExecutor(new FillHoleCommand());
         Objects.requireNonNull(getCommand("fillhole")).setTabCompleter(new FillHoleTabCompleter());
+
+        Objects.requireNonNull(getCommand("extendsel")).setExecutor(new ExtendSelection());
+        Objects.requireNonNull(getCommand("extendsel")).setTabCompleter(new ExtendSelection());
 
         getLogger().info(" FillHole command Registered !");
         getLogger().info(" All Commands Registered !");
