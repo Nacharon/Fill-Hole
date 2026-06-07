@@ -12,9 +12,13 @@ import org.jspecify.annotations.NonNull;
 
 import java.util.List;
 
+/**
+ *
+ */
 public class ExtendSelection implements CommandExecutor, TabCompleter {
+
     /**
-     * Handles the execution of the /fillhole command.
+     * Handles the execution of the /extendsel command.
      *
      * @param sender  the sender of the command
      * @param command the command being executed
@@ -36,7 +40,6 @@ public class ExtendSelection implements CommandExecutor, TabCompleter {
             return true;
         }
 
-        // check that the command is used correctly
         if (args.length < 1) {
             if (player.getScoreboardTags().contains(Config.getDisableExpendTag()))
                 player.sendMessage(TextUtils.textYellow("Extend Selection is disabled"));
@@ -68,7 +71,7 @@ public class ExtendSelection implements CommandExecutor, TabCompleter {
     }
 
     /**
-     * Provides tab completion suggestions for the /fillhole command.
+     * Provides tab completion suggestions for the /extendsel command.
      *
      * @param sender  The sender of the command.
      * @param command The command being executed.

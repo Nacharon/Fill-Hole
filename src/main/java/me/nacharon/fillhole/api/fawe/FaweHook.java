@@ -158,21 +158,21 @@ public class FaweHook {
     }
 
     /**
-     * Retrieves the current WorldEdit selection for a given LocalSession.
+     * Retrieves the WorldEdit selection for a given LocalSession and player.
      *
      * @param session The LocalSession from which to retrieve the selection.
-     * @param player The LocalSession from which to retrieve the selection.
-     * @return The Region representing the selection.
+     * @param player player whose selection is retrieved.
+     * @return The selection itself.
      */
     public static RegionSelector getRegionSelection(LocalSession session, Player player) {
         return session.getRegionSelector(getBukkitPlayer(player).getWorld());
     }
 
     /**
-     * Retrieves the current WorldEdit selection for a given player.
+     * Retrieves the WorldEdit selection for a given player.
      *
      * @param player The player whose selection is retrieved.
-     * @return The Region representing the player's selection.
+     * @return The selection itself.
      */
     public static RegionSelector getRegionSelection(Player player) {
         return getRegionSelection(getLocalSession(player), player);
@@ -299,6 +299,13 @@ public class FaweHook {
             return block.z();
     }
 
+    /**
+     * Return if the player hold the worldedit wand in main hand
+     *
+     * @param player The player to check the inventory
+     * @param session The local session
+     * @return True if the player hold the worldedit wand, false otherwise
+     */
     public static boolean isHoldingSelectionWand(Player player, LocalSession session) {
         ItemType mainHand = getItemType(player.getInventory().getItemInMainHand());
         if (mainHand == null) return false;
@@ -309,10 +316,22 @@ public class FaweHook {
         return wandTool.getType().equals(mainHand);
     }
 
+    /**
+     * Return if the player hold the worldedit wand in main hand
+     *
+     * @param player The player to check the inventory
+     * @return True if the player hold the worldedit wand, false otherwise
+     */
     public static boolean isHoldingSelectionWand(Player player) {
         return isHoldingSelectionWand(player, getLocalSession(player));
     }
 
+    /**
+     * Extend the cuboid selection at the specified selection
+     *
+     * @param selection The cuboid selection
+     * @param position The position where extend selection
+     */
     public static void extendSelection(CuboidRegionSelector selection, BlockVector3 position) {
         BlockVector3 pos1 = selection.getPrimaryPosition();
         BlockVector3 pos2 = selection.getIncompleteRegion().getPos2();

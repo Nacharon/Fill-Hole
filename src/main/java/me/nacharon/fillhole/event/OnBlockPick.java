@@ -15,6 +15,12 @@ import org.bukkit.event.Listener;
 
 public class OnBlockPick implements Listener {
 
+    /**
+     * If the player has the worldedit wand and pick a block,
+     * the cuboid selection are extended with the targeted block
+     *
+     * @param pickBlockEvent the pick block event
+     */
     @EventHandler
     public void pickBlockHandler(PlayerPickBlockEvent pickBlockEvent) {
         Player player = pickBlockEvent.getPlayer();
